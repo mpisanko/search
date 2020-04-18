@@ -4,10 +4,10 @@ Coding assignment from Zendesk
 
 ## Design
 In order to make sure search time does not linearly increase with number of documents - a naaive version of inverse index will be used (not taking into account document frequency, just occurences).
-There will also be separate indices for relating the entities between each other and searching by ids (internal / external) and boolean/enum type fields.
+There will be separate indices per entity, which also relate the entities between each other.
 Indices will be built ahead of time and stored in files in order to avoid long startups - as being a command line app - each invocation only allows a single query.
 Given above assumptions I will create following high level modules:
- - ingestion and index building
+ - index building
  - runtime search (given indices and query - find results)
  - command line application which can:
     - read query, invoke search and present results
@@ -15,6 +15,7 @@ Given above assumptions I will create following high level modules:
 
 ## Installation
 
+Install JDK 11 or higher (even though 8+ should also work).
 Download from https://github.com/mpisanko/search.
 
 ## Usage
@@ -32,8 +33,16 @@ Run that uberjar:
     $ java -jar search.jar [Options]
 
 ## Options
+Following options are available to pass to application invocation:
 
-FIXME: listing of options this app accepts.
+  -h, --help          Print help information
+  -i, --index         Create indices (all other options ignored)
+  -o, --organisation  Query by organisation
+  -u, --user          Query by user
+  -t, --ticket        Query by ticket
+  -e, --empty         Query for empty field specifying path to entity.field as argument, eg: 'user.alias'
+
+When querying the arguments will be search query or entity.field which should be empty (when querying for empty field values)
 
 # OVERVIEW
 Using the provided data (tickets.json and users.json and organization.json) write a simple command line application to search the data and return the results in a human readable format.
