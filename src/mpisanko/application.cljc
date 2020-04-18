@@ -5,7 +5,7 @@
             [mpisanko.search :as search])
   (:gen-class))
 
-(defn- help [summary errors]
+(defn- show-help [summary errors]
   (when (seq errors)
     (println (str/join "\n" errors)))
   (println (str "Usage:\n" summary))
@@ -21,13 +21,26 @@
 
 (def empty-field-error "Please specify which field of which entity should be empty, eg: organisation.description")
 
+(defn- no-search-argument [options]
+  (let [entity (->> options (filter val) (map (comp name key)) first)]
+    (str "Please specify a search term for " entity)))
+
 (defn -main
   "Main entrypoint to the application. Parse command line options and dispatch to correct command"
   [& args]
-  (let [{:keys [options summary arguments errors]} (cli/parse-opts args cli-options)]
+  (let [{:keys [options summary arguments errors]} (cli/parse-opts args cli-options)
+        {:keys [help index empty organisation user ticket]} options]
     (cond
-      (or (:help options) errors) (help summary errors)
-      (and (:empty options) (empty? arguments)) (help summary [empty-field-error])
-      (:index options) (index/create)
-      :default (search/query options arguments))))
+      (or help (seq errors))
+      (show-help summary errors)
+      (and (empty? arguments) empty)
+      (show-help summary [empty-field-error])
+      (and (empty? arguments) (or organisation user ticket))
+          (show-help summary [(no-search-argument options)])
+      index
+      (index/create)
+      (or organisation user ticket)
+      (search/query options arguments)
+      :default
+      (show-help summary errors))))
 

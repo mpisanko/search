@@ -17,7 +17,7 @@
 (def usage (:summary (cli/parse-opts ["-h"] app/cli-options)))
 
 (deftest main-test-errors
-  (with-redefs [app/help (fn [opts errs]
+  (with-redefs [app/show-help (fn [opts errs]
                          (reset! summary opts)
                          (reset! errors errs))
                 i/create (fn []
@@ -49,7 +49,7 @@
       (is (= usage @summary)))))
 
 (deftest main-test-empty
-  (with-redefs [app/help (fn [opts errs]
+  (with-redefs [app/show-help (fn [opts errs]
                          (reset! summary opts)
                          (reset! errors errs))
                 i/create (fn []
@@ -58,10 +58,34 @@
       (app/-main "-e" "org.name" "foobar")
       (is (nil? @errors))
       (is (zero? @index))
-      (is (nil? @summary)))))
+      (is (= usage @summary)))))
+
+(deftest main-test-search-no-term
+  (with-redefs [app/show-help (fn [opts errs]
+                                (reset! summary opts)
+                                (reset! errors errs))
+                i/create (fn []
+                           (swap! index inc))]
+    (testing "it asks to give a search term for org"
+      (app/-main "-o")
+      (is (= ["Please specify a search term for organisation"] @errors))
+      (is (zero? @index))
+      (is (= usage @summary)))
+
+    (testing "it asks to give a search term for user"
+      (app/-main "-u")
+      (is (= ["Please specify a search term for user"] @errors))
+      (is (zero? @index))
+      (is (= usage @summary)))
+
+    (testing "it asks to give a search term for ticket"
+      (app/-main "-t")
+      (is (= ["Please specify a search term for ticket"] @errors))
+      (is (zero? @index))
+      (is (= usage @summary)))))
 
 (deftest main-test-index
-  (with-redefs [app/help (fn [opts errs]
+  (with-redefs [app/show-help (fn [opts errs]
                          (reset! summary opts)
                          (reset! errors errs))
                 i/create (fn []
