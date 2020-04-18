@@ -32,15 +32,15 @@
         {:keys [help index empty organisation user ticket]} options]
     (cond
       (or help (seq errors))
-      (show-help summary errors)
+          (show-help summary errors)
       (and (empty? arguments) empty)
-      (show-help summary [empty-field-error])
+          (show-help summary [empty-field-error])
       (and (empty? arguments) (or organisation user ticket))
           (show-help summary [(no-search-argument options)])
       index
-      (index/create)
+          (index/create)
       (or organisation user ticket)
-      (search/query options arguments)
+          (search/query options arguments)
       :default
-      (show-help summary errors))))
+          (show-help summary errors))))
 
