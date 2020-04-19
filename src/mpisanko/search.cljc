@@ -18,14 +18,14 @@
 
 (defn- find-empty [entities empty-field]
   (filter (fn [entity]
-            (let [v (get entity empty-field)]
+            (let [v (get entity (keyword empty-field))]
               (if (coll? v)
                 (empty? v)
                 (or (nil? v) (= "" v)))))
           (vals entities)))
 
 (defn- find-entity [index entities arguments]
-  (let [matched-ids (distinct (mapcat #(get index %) arguments))
+  (let [matched-ids (distinct (mapcat #(get index %) (map str/lower-case arguments)))
         matches (vals (select-keys entities matched-ids))]
     matches))
 
@@ -39,4 +39,4 @@
         {:keys [index entities]} (read-index entity)]
     (if empty
       (find-empty entities (first arguments))
-      (find-entity index entities (map str/lower-case arguments)))))
+      (find-entity index entities arguments))))
