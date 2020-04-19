@@ -2,6 +2,7 @@
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
+            [clojure.string :as str]
             [mpisanko.indexing.organisation :as organisation])
   (:import (java.io IOException)))
 
@@ -10,7 +11,7 @@
    No stemming or lemmatisation."
   [tokenise-fn index entity]
   (reduce (fn [index word]
-            (update index word conj (:_id entity)))
+            (update index (str/lower-case word) conj (:_id entity)))
           index
           (tokenise-fn entity)))
 
@@ -41,6 +42,8 @@
   (let [organisations (read-decode "organizations.json")
         users (read-decode "users.json")
         tickets (read-decode "tickets.json")
-        organisation-index (organisation/index inverted-index organisations users tickets)]
-    (log/debugf "Will write indexed organisations: %s" (count (:entities organisation-index)))
-    (write-edn "organisation-index.edn" organisation-index)))
+        organisation-index (organisation/index inverted-index organisations users tickets)
+        indexed-count {:organisations (count (:entities organisation-index))}]
+    (log/debugf "Will write indexed organisations: %s" indexed-count)
+    (write-edn "organisation-index.edn" organisation-index)
+    indexed-count))

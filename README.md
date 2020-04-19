@@ -40,7 +40,7 @@ Following options are available to pass to application invocation:
   -o, --organisation  Query by organisation
   -u, --user          Query by user
   -t, --ticket        Query by ticket
-  -e, --empty         Query for empty field specifying path to entity.field as argument, eg: 'user.alias'
+  -e, --empty         Query for empty field specifying path to entity - field as argument, eg: 'user alias'
 
 When querying the arguments will be search query or entity.field which should be empty (when querying for empty field values)
 

@@ -12,3 +12,6 @@
 .idea/
 *.iml
 /logs
+organisation-index.edn
+user-index.edn
+ticket-index.edn

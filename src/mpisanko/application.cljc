@@ -19,9 +19,9 @@
    ["-o" "--organisation" "Query by organisation"]
    ["-u" "--user" "Query by user"]
    ["-t" "--ticket" "Query by ticket"]
-   ["-e" "--empty" "Query for empty field specifying path to entity.field as argument, eg: 'user.alias'"]])
+   ["-e" "--empty" "Query for empty field specifying path to entity.field as argument, eg: 'user alias'"]])
 
-(def empty-field-error "Please specify which field of which entity should be empty, eg: organisation.description")
+(def empty-field-error "Please specify which entity and field should be empty, eg: 'organisation details'")
 
 (defn- no-search-argument [options]
   (let [entity (->> (filter options (keys options)) (map name) first)]
@@ -45,11 +45,13 @@
           (show-help summary [(no-search-argument options)])
       index
           (try
-            (index/create)
+            (let [indexed (index/create)]
+              (println (str "Created indices of " (pr-str indexed))))
             (catch ExceptionInfo e
               (indexing-exception e)))
       (or organisation user ticket)
-          (search/query options arguments)
+          (let [found (search/query options arguments)]
+            (println (count found) "results matching your query:\n" (pr-str found)))
       :default
           (show-help summary errors))))
 

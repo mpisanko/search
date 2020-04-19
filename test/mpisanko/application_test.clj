@@ -55,7 +55,7 @@
                 i/create (fn []
                            (swap! index inc))]
     (testing "it asks to specify entity/field which should be empty when searching by empty field"
-      (app/-main "-e" "org.name" "foobar")
+      (app/-main "-e" "organisation" "details")
       (is (nil? @errors))
       (is (zero? @index))
       (is (= usage @summary)))))

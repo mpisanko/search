@@ -1,4 +1,4 @@
-(ns mpisanko.indexing.organisation-text
+(ns mpisanko.indexing.organisation-test
   (:require [clojure.test :refer :all]
             [mpisanko.indexing.organisation :as o]
             [clojure.string :as str]))
