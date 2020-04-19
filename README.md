@@ -3,15 +3,17 @@
 Coding assignment from Zendesk
 
 ## Design
-In order to make sure search time does not linearly increase with number of documents - a naaive version of inverse index will be used (not taking into account document frequency, just occurences).
+In order to make sure search time does not linearly increase with number of documents - a naaive version of inverse index will be used (not taking into account document frequency, just occurences, without stemming or lemmatisation).
 There will be separate indices per entity, which also relate the entities between each other.
 Indices will be built ahead of time and stored in files in order to avoid long startups - as being a command line app - each invocation only allows a single query.
+In the interest of search performance the indices will be denormalised (eg. each organisation will have each of its users and tickets on the document)
 Given above assumptions I will create following high level modules:
  - index building
  - runtime search (given indices and query - find results)
  - command line application which can:
     - read query, invoke search and present results
     - create indices for runtime search
+ - presenters for showing results in human readable form 
 
 ## Installation
 
