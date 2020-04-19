@@ -19,9 +19,9 @@
    ["-o" "--organisation" "Query by organisation"]
    ["-u" "--user" "Query by user"]
    ["-t" "--ticket" "Query by ticket"]
-   ["-e" "--empty" "Query for empty field specifying path to entity.field as argument, eg: 'user alias'"]])
+   ["-e" "--empty" "Query for empty field specifying entity (one of the above flags) and field as argument, eg: '-u alias'"]])
 
-(def empty-field-error "Please specify which entity and field should be empty, eg: 'organisation details'")
+(def empty-field-error "Please specify which entity (via flag) and field should be empty, eg: '-e -o details'")
 
 (defn- no-search-argument [options]
   (let [entity (->> (filter options (keys options)) (map name) first)]
@@ -39,10 +39,12 @@
     (cond
       (or help (seq errors))
           (show-help summary errors)
-      (and (empty? arguments) empty)
+      (and (empty? arguments) empty (every? (complement true?) [organisation user ticket]))
           (show-help summary [empty-field-error])
       (and (empty? arguments) (or organisation user ticket))
-          (show-help summary [(no-search-argument options)])
+          (if empty
+            (show-help summary [empty-field-error])
+            (show-help summary [(no-search-argument options)]))
       index
           (try
             (let [indexed (index/create)]

@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [mpisanko.application :as app]
             [mpisanko.index :as i]
+            [mpisanko.search :as s]
             [clojure.tools.cli :as cli]))
 
 (def summary (atom {}))
@@ -46,6 +47,13 @@
       (is (= [app/empty-field-error]
              @errors))
       (is (zero? @index))
+      (is (= usage @summary)))
+
+    (testing "it asks to specify entity/field which should be empty when searching by empty field"
+      (app/-main "-e" "-u")
+      (is (= [app/empty-field-error]
+             @errors))
+      (is (zero? @index))
       (is (= usage @summary)))))
 
 (deftest main-test-empty
@@ -53,12 +61,13 @@
                          (reset! summary opts)
                          (reset! errors errs))
                 i/create (fn []
-                           (swap! index inc))]
+                           (swap! index inc))
+                s/query (fn [_ _] nil)]
     (testing "it asks to specify entity/field which should be empty when searching by empty field"
-      (app/-main "-e" "organisation" "details")
+      (app/-main "-e" "-o" "details")
       (is (nil? @errors))
       (is (zero? @index))
-      (is (= usage @summary)))))
+      (is (nil? @summary)))))
 
 (deftest main-test-search-no-term
   (with-redefs [app/show-help (fn [opts errs]

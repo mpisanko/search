@@ -16,29 +16,27 @@
     (with-open [r (PushbackReader. (io/reader index-file))]
       (edn/read r))))
 
-(defn- find-empty [arguments]
-  (let [[entity search-term] arguments
-        {:keys [entities]} (read-index entity)]
-    (filter (fn [entity]
-              (let [v (get entity search-term)]
-                (if (coll? v)
-                  (empty? v)
-                  (or (nil? v) (= "" v)))))
-            (vals entities))))
+(defn- find-empty [entities empty-field]
+  (filter (fn [entity]
+            (let [v (get entity empty-field)]
+              (if (coll? v)
+                (empty? v)
+                (or (nil? v) (= "" v)))))
+          (vals entities)))
 
-(defn- find-entity [organisation user ticket search-term]
+(defn- find-entity [index entities arguments]
+  (let [matched-ids (distinct (mapcat #(get index %) arguments))
+        matches (vals (select-keys entities matched-ids))]
+    matches))
+
+(defn query
+  "Perform a search given a query"
+  [{:keys [organisation user ticket empty]} arguments]
   (let [entity (cond
                  organisation "organisation"
                  user "user"
                  ticket "ticket")
         {:keys [index entities]} (read-index entity)]
-    (let [matched-ids (get index search-term)
-          matches (vals (select-keys entities matched-ids))]
-      matches)))
-
-(defn query
-  "Perform a search given a query"
-  [{:keys [organisation user ticket empty]} arguments]
-  (if empty
-    (find-empty arguments)
-    (find-entity organisation user ticket (str/lower-case (first arguments)))))
+    (if empty
+      (find-empty entities (first arguments))
+      (find-entity index entities (map str/lower-case arguments)))))
