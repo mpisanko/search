@@ -3,7 +3,8 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [mpisanko.index :as index]
-            [mpisanko.search :as search])
+            [mpisanko.search :as search]
+            [mpisanko.presenter :as presenter])
   (:import (clojure.lang ExceptionInfo))
   (:gen-class))
 
@@ -29,7 +30,7 @@
 
 (defn- indexing-exception [e]
   (let [{:keys [problem target]} (ex-data e)]
-   (log/errorf e "Problem while creating index: %s %s" problem target)))
+    (log/errorf e "Problem while creating index: %s %s" problem target)))
 
 (defn -main
   "Main entrypoint to the application. Parse command line options and dispatch to correct command"
@@ -42,9 +43,7 @@
       (and (empty? arguments) empty (every? (complement true?) [organisation user ticket]))
           (show-help summary [empty-field-error])
       (and (empty? arguments) (or organisation user ticket))
-          (if empty
-            (show-help summary [empty-field-error])
-            (show-help summary [(no-search-argument options)]))
+          (show-help summary [(if empty empty-field-error (no-search-argument options))])
       index
           (try
             (let [indexed (index/create)]
@@ -52,8 +51,15 @@
             (catch ExceptionInfo e
               (indexing-exception e)))
       (or organisation user ticket)
-          (let [found (search/query options arguments)]
-            (println (count found) "results matching your query:\n" (pr-str found)))
+          (let [found (search/query options arguments)
+                type (cond
+                       organisation "organisation"
+                       user         "user"
+                       ticket       "ticket")]
+            (println (str (count found)
+                          " results match your query\n"
+                          (when (seq found)
+                            (presenter/display type found)))))
       :default
           (show-help summary errors))))
 
