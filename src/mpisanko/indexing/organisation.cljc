@@ -1,5 +1,6 @@
 (ns mpisanko.indexing.organisation
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [mpisanko.indexing.entities :as entities]))
 
 (defn- words [s]
   (str/split s #"\s+"))
@@ -29,11 +30,11 @@
       {}
       organisations-by-id)))
 
-(defn index [index-fn organisations users tickets]
+(defmethod entities/index "organisation" [entity index-fn organisations users tickets]
   (let [index (reduce (partial index-fn tokens)
                       {}
                       organisations)
         enriched (enrich organisations users tickets)]
     {:index index
      :entities enriched
-     :type "organisation"}))
+     :type entity}))

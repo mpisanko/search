@@ -1,6 +1,7 @@
 (ns mpisanko.index-test
   (:require [clojure.test :refer :all]
-            [mpisanko.index :as i])
+            [mpisanko.index :as i]
+            [mpisanko.indexing.entities :as e])
   (:import (java.io File)
            (clojure.lang ExceptionInfo)))
 
@@ -19,21 +20,46 @@
   (testing "when we can write and there is enough space"
     (let [f "test/test.edn"
           payload {:a 1}]
-      (#'mpisanko.index/write-edn f payload)
+      (#'i/write-edn f payload)
       (let [c (read-string (slurp f))]
         (is (= payload c)))
       (.delete (File. f))))
 
   (testing "when there is a problem writing to file"
     (is (thrown? ExceptionInfo
-                 (#'mpisanko.index/write-edn "/not-there/foo" {})))))
+                 (#'i/write-edn "/not-there/foo" {})))))
 
 (deftest read-decode-test
   (testing "it reads in a JSON file and decodes to a sequence of maps"
-    (let [orgs (#'mpisanko.index/read-decode "organizations.json")]
+    (let [orgs (#'i/read-decode "organizations.json")]
       (is (coll? orgs))
       (is (= 25 (count orgs)))))
 
   (testing "when the file does not exist"
     (is (thrown? ExceptionInfo
-                 (#'mpisanko.index/read-decode "foobar-not-there")))))
+                 (#'i/read-decode "foobar-not-there")))))
+
+(deftest index-test
+  (testing "correct files are used as input, output and multimethod dispatches to correct entities"
+   (let [read-files (atom [])
+         written-files (atom [])
+         index-calls (atom [])]
+     (with-redefs [i/read-decode (fn [file]
+                                   (swap! read-files conj file)
+                                   [])
+                   i/write-edn (fn [file _]
+                                 (swap! written-files conj file))
+                   e/index (fn [e _ _ _ _]
+                             (swap! index-calls conj e)
+                             {})]
+       (i/create)
+       (is (= ["organizations.json"
+               "users.json"
+               "tickets.json"]
+              @read-files))
+       (is (= ["organisation-index.edn"
+               "user-index.edn"]
+              @written-files))
+       (is (= ["organisation"
+               "user"]
+              @index-calls))))))
