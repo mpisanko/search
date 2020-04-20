@@ -13,7 +13,7 @@
     (first (indexer/words created_at))))
 
 (defn enrich
-  "Group organisations by their ID and associate related entities onto each organisation"
+  "Map organisations by their ID and associate related entities onto each organisation"
   [organisations users tickets]
   (let [users-by-org (group-by :organization_id users)
         tickets-by-org (group-by :organization_id tickets)

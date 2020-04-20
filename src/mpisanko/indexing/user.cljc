@@ -18,7 +18,7 @@
     (first (indexer/words last_login_at))))
 
 (defn enrich
-  "Group users by their ID and associate related entities onto each user"
+  "Map users by their ID and associate related entities onto each user"
   [organisations users tickets]
   (let [users-by-id (group-by :_id users)
         organisations-by-id (group-by :_id organisations)
