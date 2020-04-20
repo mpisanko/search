@@ -33,8 +33,10 @@
                "tickets.json"]
               @read-files))
        (is (= ["organisation-index.edn"
-               "user-index.edn"]
+               "user-index.edn"
+               "ticket-index.edn"]
               @written-files))
        (is (= ["organisation"
-               "user"]
+               "user"
+               "ticket"]
               @index-calls))))))
