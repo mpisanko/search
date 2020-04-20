@@ -3,7 +3,8 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [clojure.string :as str]
-            [mpisanko.indexing.organisation :as organisation])
+            [mpisanko.indexing.organisation :as organisation]
+            [mpisanko.indexing.user :as user])
   (:import (java.io IOException)))
 
 (defn inverted-index
@@ -43,8 +44,11 @@
         users (read-decode "users.json")
         tickets (read-decode "tickets.json")
         organisation-index (organisation/index inverted-index organisations users tickets)
-        indexed-count {:organisations (count (:entities organisation-index))}]
+        user-index (user/index inverted-index organisations users tickets)
+        indexed-count {:organisations (count (:entities organisation-index))
+                       :users (count (:entities user-index))}]
     (log/debugf "Found %s organisations, %s users, %s tickets" (count organisations) (count users) (count tickets))
     (log/debugf "Will write indexed entities: %s" (pr-str indexed-count))
     (write-edn "organisation-index.edn" organisation-index)
+    (write-edn "user-index.edn" user-index)
     indexed-count))
