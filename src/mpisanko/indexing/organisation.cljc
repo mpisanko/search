@@ -29,11 +29,11 @@
       {}
       organisations-by-id)))
 
-(defn index [index-fn orgs users tickets]
+(defn index [index-fn organisations users tickets]
   (let [index (reduce (partial index-fn tokens)
                       {}
-                      orgs)
-        enriched (enrich orgs users tickets)]
+                      organisations)
+        enriched (enrich organisations users tickets)]
     {:index index
      :entities enriched
-     :type "organisations"}))
+     :type "organisation"}))

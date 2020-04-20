@@ -6,7 +6,9 @@ Coding assignment from Zendesk
 In order to make sure search time does not linearly increase with number of documents - a naaive version of inverse index will be used (not taking into account document frequency, just occurences, without stemming or lemmatisation).
 There will be separate indices per entity, which also relate the entities between each other.
 Indices will be built ahead of time and stored in files in order to avoid long startups - as being a command line app - each invocation only allows a single query.
-In the interest of search performance the indices will be denormalised (eg. each organisation will have each of its users and tickets on the document)
+In the interest of search performance the indices will be denormalised (eg. each organisation will have each of its users and tickets on the document).
+Searching will only match on full word(s), case insensitive. 
+The application takes a rather simplified approach of only allowing searching a single entity at a time (organisation/use/ticket).
 Given above assumptions I will create following high level modules:
  - index building
  - runtime search (given indices and query - find results)
@@ -17,7 +19,7 @@ Given above assumptions I will create following high level modules:
 
 ## Installation
 
-Install JDK 11 or higher (even though 8+ should also work).
+Install JDK 11 or higher (even though 8+ should also work) and optionally [Clojure](https://clojure.org/guides/getting_started#_clojure_installer_and_cli_tools).
 Download from https://github.com/mpisanko/search.
 
 ## Usage
@@ -38,13 +40,13 @@ Run that uberjar:
 Following options are available to pass to application invocation:
 
   -h, --help          Print help information
-  -i, --index         Create indices (all other options ignored)
+  -i, --index         Create indices
   -o, --organisation  Query by organisation
   -u, --user          Query by user
   -t, --ticket        Query by ticket
-  -e, --empty         Query for empty field specifying path to entity - field as argument, eg: 'user alias'
+  -e, --empty         Query for empty field specifying entity (one of the above flags) and field as argument, eg: '-u alias'  
 
-When querying the arguments will be search query or entity.field which should be empty (when querying for empty field values)
+When querying the arguments will be search query or field which should be empty (when querying for empty field values - specify which entity you're querying using flag, eg `-e -u alias` to query for users who do not have alias)
 
 # OVERVIEW
 Using the provided data (tickets.json and users.json and organization.json) write a simple command line application to search the data and return the results in a human readable format.
