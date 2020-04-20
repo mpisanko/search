@@ -44,6 +44,7 @@
         tickets (read-decode "tickets.json")
         organisation-index (organisation/index inverted-index organisations users tickets)
         indexed-count {:organisations (count (:entities organisation-index))}]
-    (log/debugf "Will write indexed organisations: %s" indexed-count)
+    (log/debugf "Found %s organisations, %s users, %s tickets" (count organisations) (count users) (count tickets))
+    (log/debugf "Will write indexed entities: %s" (pr-str indexed-count))
     (write-edn "organisation-index.edn" organisation-index)
     indexed-count))
