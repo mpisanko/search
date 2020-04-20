@@ -1,19 +1,16 @@
 (ns mpisanko.indexing.organisation
-  (:require [clojure.string :as str]
-            [mpisanko.indexing.entities :as entities]))
-
-(defn- words [s]
-  (str/split s #"\s+"))
+  (:require [mpisanko.indexing.indexer :as indexer]))
 
 (defn tokens
   "Basic tokenisation function - only using selected words"
   [{:keys [name details tags domain_names external_id created_at]}]
-  (concat (words name)
-          (words details)
-          (mapcat words tags)
-          (mapcat words domain_names)
-          [external_id]
-          (drop-last (words created_at))))
+  (conj
+    (mapcat indexer/words
+            (conj
+              (into tags domain_names)
+              name details))
+    external_id
+    (first (indexer/words created_at))))
 
 (defn enrich
   "Group organisations by their ID and associate related entities onto each organisation"
@@ -30,11 +27,5 @@
       {}
       organisations-by-id)))
 
-(defmethod entities/index "organisation" [entity index-fn organisations users tickets]
-  (let [index (reduce (partial index-fn tokens)
-                      {}
-                      organisations)
-        enriched (enrich organisations users tickets)]
-    {:index index
-     :entities enriched
-     :type entity}))
+(defmethod indexer/tokeniser-enricher-entities "organisation" [_ organisations _users _tickets]
+  [tokens enrich organisations])
