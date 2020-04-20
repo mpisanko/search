@@ -5,13 +5,19 @@
   (when s
     (str/split s #"\s+")))
 
+(defn sanitise [word]
+  (some-> word
+          (str/replace #"^[.,]?(.+?)[.,]?$" "$1")
+          str/lower-case))
+
 (defn inverted-index
   "Create a naaive version of inverted index.
+   Normalise to lower case and remove trailing commas / full stops
    No stemming or lemmatisation."
   [tokenise-fn index entity]
   (reduce (fn [index word]
-            (if word
-              (update index (str/lower-case word) conj (:_id entity))
+            (if-let [word' (sanitise word)]
+              (update index (str/lower-case word') conj (:_id entity))
               index))
           index
           (tokenise-fn entity)))
