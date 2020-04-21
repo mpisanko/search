@@ -44,10 +44,15 @@ Run that uberjar:
 Following options are available to pass to application invocation:
 
   -h, --help          Print help information
+  
   -i, --index         Create indices
+  
   -o, --organisation  Query by organisation
+  
   -u, --user          Query by user
+  
   -t, --ticket        Query by ticket
+  
   -e, --empty         Query for empty field specifying entity (one of the above flags) and field as argument, eg: '-u alias'  
 
 It's a good idea to first create indices (run the application with -i flag) before querying.
