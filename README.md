@@ -16,6 +16,10 @@ Given above assumptions I will create following high level modules:
     - read query, invoke search and present results
     - create indices for runtime search
  - presenters for showing results in human readable form 
+ 
+### Outstanding things (not done due to timeboxing this task)
+ - search using flags for boolean attributes (eg user active, verified, etc)
+ - compilation with GraalVM to achieve shorter startup times (JVM takes significant time starting up due to loading classes etc. GraalVM produces native executable with much better startup times)
 
 ## Installation
 
@@ -46,6 +50,9 @@ Following options are available to pass to application invocation:
   -t, --ticket        Query by ticket
   -e, --empty         Query for empty field specifying entity (one of the above flags) and field as argument, eg: '-u alias'  
 
+It's a good idea to first create indices (run the application with -i flag) before querying.
+The application requires input files (organizations.json, users.json, tickets.json in the working directory - root of project, where the jar is).
+It will create indices in the root directory of the project (or whereever you run the jar from) - so that directory needs to be user-writeable and have sufficient disk space. 
 When querying the arguments will be search query or field which should be empty (when querying for empty field values - specify which entity you're querying using flag, eg `-e -u alias` to query for users who do not have alias)
 
 # OVERVIEW
