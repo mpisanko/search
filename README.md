@@ -17,6 +17,23 @@ Given above assumptions I will create following high level modules:
     - create indices for runtime search
  - presenters for showing results in human readable form 
  
+### Load testing
+There is a single load test (`test/load/search_load_test.clj`) which will run a query for each of the entities with specified arguments and empty flag.
+Tests will use files in the root directory (organizations.json, users.json, tickets.json) which can be substituted for some containing more entities.
+To run it use:
+
+    $ clojure -A:test:runner:load -i :load
+
+optionally passing environment variables `ARGS` and `EMPTY` to set those values, eg:
+
+    $ ARGS='artisan geekfarm' clojure -A:test:runner:load -i :load
+
+will run load tests for each of the entities searching for those matching 'artisan' or 'geekfarm'
+
+    $ ARGS=external_id EMPTY=true clojure -A:test:runner:load -i :load
+
+will run load tests for each entity looking for those with empty external_id field.
+
 ### Outstanding things (not done due to timeboxing this task)
  - search using flags for boolean attributes (eg user active, verified, etc)
  - compilation with GraalVM to achieve shorter startup times (JVM takes significant time starting up due to loading classes etc. GraalVM produces native executable with much better startup times)

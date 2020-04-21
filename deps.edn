@@ -15,4 +15,6 @@
                                 "-d" "test"]}
          :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}
                    :main-opts  ["-m" "hf.depstar.uberjar" "search.jar"
-                                "-C" "-m" "mpisanko.application"]}}}
+                                "-C" "-m" "mpisanko.application"]}
+         :load    {:extra-paths ["test/load"]
+                   :extra-deps {:criterium {:mvn/version "0.4.4"}}}}}
