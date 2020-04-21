@@ -15,4 +15,4 @@
                                 "-d" "test"]}
          :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}
                    :main-opts  ["-m" "hf.depstar.uberjar" "search.jar"
-                                "-C" "-m" "mpisanko.search"]}}}
+                                "-C" "-m" "mpisanko.application"]}}}
