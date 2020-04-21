@@ -37,6 +37,7 @@
                  user "user"
                  ticket "ticket")
         {:keys [index entities]} (read-index entity)]
-    (if empty
-      (find-empty entities (first arguments))
-      (find-entity index entities arguments))))
+    [(if empty
+       (find-empty entities (first arguments))
+       (find-entity index entities arguments))
+     entity]))

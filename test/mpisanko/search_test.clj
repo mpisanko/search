@@ -59,9 +59,11 @@
 (deftest query-test
   (with-redefs [s/read-index (fn [_]  {:index index :entities entities})]
     (testing "querying for a field"
-      (let [results (s/query {:organisation true} ["foo"])]
+      (let [[results entity] (s/query {:organisation true} ["foo"])]
+        (is (= "organisation" entity))
         (is (= 2 (count results)))))
 
     (testing "querying for empty field"
-      (let [results (s/query {:organisation true :empty true} ["tags"])]
+      (let [[results entity] (s/query {:organisation true :empty true} ["tags"])]
+        (is (= "organisation" entity))
         (is (= 1 (count results)))))))

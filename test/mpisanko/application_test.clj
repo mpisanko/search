@@ -19,8 +19,8 @@
 
 (deftest main-test-errors
   (with-redefs [app/show-help (fn [opts errs]
-                         (reset! summary opts)
-                         (reset! errors errs))
+                                (reset! summary opts)
+                                (reset! errors errs))
                 i/create (fn []
                            (swap! index inc))]
     (testing "it prints help when requested"
@@ -58,8 +58,8 @@
 
 (deftest main-test-empty
   (with-redefs [app/show-help (fn [opts errs]
-                         (reset! summary opts)
-                         (reset! errors errs))
+                                (reset! summary opts)
+                                (reset! errors errs))
                 i/create (fn []
                            (swap! index inc))
                 s/query (fn [_ _] nil)]
@@ -95,8 +95,8 @@
 
 (deftest main-test-index
   (with-redefs [app/show-help (fn [opts errs]
-                         (reset! summary opts)
-                         (reset! errors errs))
+                                (reset! summary opts)
+                                (reset! errors errs))
                 i/create (fn []
                            (swap! index inc))]
     (testing "it asks to create indices when specified"

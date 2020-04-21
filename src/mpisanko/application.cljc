@@ -32,34 +32,40 @@
   (let [{:keys [problem target]} (ex-data e)]
     (log/errorf e "Problem while creating index: %s %s" problem target)))
 
+(defn- valid-combination? [index organisation user ticket arguments]
+  (let [selected-entities (count (filter identity [organisation user ticket]))]
+    (or
+      (and index (zero? selected-entities))
+      (and (seq arguments) (= 1 selected-entities)))))
+
+(defn- explain-usage [options summary errors]
+  (let [{:keys [help empty]} options]
+    (if (or help (seq errors))
+      (show-help summary errors)
+      (show-help summary [(if empty empty-field-error (no-search-argument options))]))))
+
+(defn- create-indices []
+  (try
+    (let [indexed (index/create)]
+      (println (str "Created indices of " (pr-str indexed))))
+    (catch ExceptionInfo e
+      (indexing-exception e))))
+
+(defn- search [options arguments]
+  (let [[results type] (search/query options arguments)]
+    (println (str (count results)
+                  " results match your query\n\n"
+                  (when (seq results)
+                    (presenter/display type results))))))
+
 (defn -main
   "Main entrypoint to the application. Parse command line options and dispatch to correct command"
   [& args]
   (let [{:keys [options summary arguments errors]} (cli/parse-opts args cli-options)
-        {:keys [help index empty organisation user ticket]} options]
-    (cond
-      (or help (seq errors))
-          (show-help summary errors)
-      (and (empty? arguments) empty (every? (complement true?) [organisation user ticket]))
-          (show-help summary [empty-field-error])
-      (and (empty? arguments) (or organisation user ticket))
-          (show-help summary [(if empty empty-field-error (no-search-argument options))])
-      index
-          (try
-            (let [indexed (index/create)]
-              (println (str "Created indices of " (pr-str indexed))))
-            (catch ExceptionInfo e
-              (indexing-exception e)))
-      (or organisation user ticket)
-          (let [found (search/query options arguments)
-                type (cond
-                       organisation "organisation"
-                       user         "user"
-                       ticket       "ticket")]
-            (println (str (count found)
-                          " results match your query\n"
-                          (when (seq found)
-                            (presenter/display type found)))))
-      :default
-          (show-help summary errors))))
+        {:keys [index organisation user ticket]} options]
+    (if (valid-combination? index organisation user ticket arguments)
+      (if index
+        (create-indices)
+        (search options arguments))
+      (explain-usage options summary errors))))
 
