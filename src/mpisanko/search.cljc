@@ -24,8 +24,13 @@
                 (or (nil? v) (= "" v)))))
           (vals entities)))
 
+(defn sanitise [word]
+  (some-> word
+          (str/replace #"^[.,]?(.+?)[.,]?$" "$1")
+          str/lower-case))
+
 (defn- find-entity [index entities arguments]
-  (let [matched-ids (distinct (mapcat #(get index %) (map str/lower-case arguments)))
+  (let [matched-ids (distinct (mapcat #(get index %) (map sanitise arguments)))
         matches (vals (select-keys entities matched-ids))]
     matches))
 
