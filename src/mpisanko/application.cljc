@@ -52,11 +52,17 @@
       (indexing-exception e))))
 
 (defn- search [options arguments]
-  (let [[results type] (search/query options arguments)]
-    (println (str (count results)
-                  " results match your query\n\n"
+  (let [[results type] (search/query options arguments)
+        matches (count results)
+        message (str matches " " type (when-not (= 1 matches) "s")
+                     " match your query\n")]
+    (println (str message
                   (when (seq results)
-                    (presenter/display type results))))))
+                    (str
+                      "\n"
+                      (presenter/display type results)
+                      "\n\n\n"
+                      message))))))
 
 (defn -main
   "Main entrypoint to the application. Parse command line options and dispatch to correct command"
